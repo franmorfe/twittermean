@@ -15,6 +15,7 @@ function pruebas(req, res){
   });
 }
 
+// Insertar nuevo usuario en la BBDD
 function saveUser(req, res){
   var params = req.body;
   var user = new User();
@@ -67,8 +68,35 @@ function saveUser(req, res){
   }
 }
 
+// Login del usuario en la BBDD
+function loginUser(req, res){
+  var params = req.body;
+
+  var email = params.email;
+  var password = params.password;
+
+  User.findOne({ email: email }, (err, user) => {
+    if(err) return res.status(500).send({ message: 'Error en la petición' });
+
+    if(user){
+      bcrypt.compare(password, user.password, (err, check) => {
+        if(check){
+          // devolver datos de usuario ocultando la password
+          user.password = undefined;
+          return res.status(200).send({ user });
+        } else {
+            return res.status(404).send({ message: 'Password incorrecta!!' });
+        }
+      });
+    } else {
+        return res.status(404).send({ message: 'Usuario incorrecto!!' });
+    }
+  });
+}
+
 module.exports = {
   home,
   pruebas,
-  saveUser
+  saveUser,
+  loginUser
 }
