@@ -141,11 +141,33 @@ function getUsers(req, res){
   });
 }
 
+// Actualizar datos de un usuarios
+function updateUser(req, res){
+  var userId = req.params.id;
+  var update = req.body;
+
+  delete update.password;
+
+  if(userId != req.user.sub){
+    return res.status(500).send({ message: 'Actualización de datos denegada' });
+  }
+
+  User.findByIdAndUpdate(userId, update, {new:true}, (err, userUpdated) => {
+    if(err) return res.status(500).send({ message: 'Error en la petición' });
+
+    if(!userUpdated) return res.status(404).send({ message: 'No se han podido actualizar los datos' });
+
+    return res.status(200).send({ user: userUpdated })
+  })
+
+}
+
 module.exports = {
   home,
   pruebas,
   saveUser,
   loginUser,
   getUser,
-  getUsers
+  getUsers,
+  updateUser
 }
