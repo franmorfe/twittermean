@@ -163,8 +163,6 @@ function updateUser(req, res){
 function uploadImage(req, res){
   var userId = req.params.id;
 
-
-
   if(req.files){
     var file_path = req.files.image.path;
     var file_split = file_path.split('/')
@@ -195,6 +193,20 @@ function uploadImage(req, res){
   }
 }
 
+function getImageFile(req, res){
+  var image_file = req.params.imageFile;
+  var path_file = './uploads/users/'+image_file;
+
+  fs.exists(path_file, (exists) =>{
+    if(exists){
+      res.sendFile(path.resolve(path_file));
+    }else{
+      res.status(200).send({ message: 'No existe la imagen' })
+    }
+  });
+
+}
+
 function removeFilesOfUploads(res, file_path, message){
   fs.unlink(file_path, (err) => {
     return res.status(200).send({ message: message })
@@ -209,5 +221,6 @@ module.exports = {
   getUser,
   getUsers,
   updateUser,
-  uploadImage
+  uploadImage,
+  getImageFile
 }
